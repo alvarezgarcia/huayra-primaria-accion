@@ -50,16 +50,6 @@ class Ventana(QWidget):
         self.layoutGeneral.addWidget(self.botonFiltros, 3, 1)
         self.layoutGeneral.addWidget(self.botonSalir, 3, 2)
 
-
-        #self.layoutGeneral = QVBoxLayout(self)
-        #self.layoutGeneral.addWidget(self.imageLabel)
-
-        #self.layoutBotonera = QHBoxLayout(self)
-        #self.layoutBotonera.addWidget(self.botonCapturar)
-        #self.layoutBotonera.addWidget(self.botonSalir)
-
-
-
         self.setWindowTitle("Huayra Primaria Accion")
         self.show()
 
@@ -72,6 +62,7 @@ class Ventana(QWidget):
         self.frameConvertir = None
 
         self.botonCapturar.clicked.connect(lambda: self.funciones.guardarCuadro(self.frame))
+        self.botonFiltros.clicked.connect(self.mostrarFiltros)
 
         
         while True:
@@ -109,8 +100,37 @@ class Ventana(QWidget):
             self.filtroActivo = None
 
         if tecla in self.funciones.funciones:
-            self.filtroActivo = tecla
+            self.activarFiltro(tecla)
 
+    def mostrarFiltros(self):
+        self.botonCapturar.setVisible(False)
+        self.botonFiltros.setVisible(False)
+        self.botonSalir.setVisible(False)
+
+
+	self.botonFiltrosVolver = QPushButton("Volver")
+	self.botonFiltrosReset = QPushButton("Reset")
+	self.botonFiltrosGris = QPushButton("Gris")
+	self.botonFiltrosComic = QPushButton("Comic")
+
+        self.botonFiltrosVolver.setStyleSheet("font-size: 30px;background-color: #D9534F;line-height: 1;color: #FFF;text-align: center;white-space: nowrap;vertical-align: baseline;border-radius: 0.25em;")
+        self.botonFiltrosReset.setStyleSheet("font-size: 30px;background-color: #337AB7;line-height: 1;color: #FFF;text-align: center;white-space: nowrap;vertical-align: baseline;border-radius: 0.25em;")
+        self.botonFiltrosGris.setStyleSheet("font-size: 30px;background-color: #337AB7;line-height: 1;color: #FFF;text-align: center;white-space: nowrap;vertical-align: baseline;border-radius: 0.25em;")
+        self.botonFiltrosComic.setStyleSheet("font-size: 30px;background-color: #337AB7;line-height: 1;color: #FFF;text-align: center;white-space: nowrap;vertical-align: baseline;border-radius: 0.25em;")
+
+
+        self.layoutGeneral.addWidget(self.imageLabel, 0, 0, 4, 4)
+
+        self.layoutGeneral.addWidget(self.botonFiltrosVolver, 4, 0)
+        self.layoutGeneral.addWidget(self.botonFiltrosReset, 4, 1)
+        self.layoutGeneral.addWidget(self.botonFiltrosGris, 4, 2)
+        self.layoutGeneral.addWidget(self.botonFiltrosComic, 4, 3)
+
+        self.botonFiltrosGris.clicked.connect(lambda: self.activarFiltro('g'))
+        self.botonFiltrosReset.clicked.connect(lambda: self.activarFiltro(None))
+
+    def activarFiltro(self, filtro):
+        self.filtroActivo = filtro
     
 
 
