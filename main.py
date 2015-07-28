@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 import sys
@@ -6,7 +7,8 @@ import sys
 class Funciones():
     def __init__(self):
         self.funciones = {
-           'g': self.grisarCuadro
+           'g': self.grisarCuadro,
+           'x': self.comicCuadro
         }
 
     def guardarCuadro(self, cuadro):
@@ -25,6 +27,28 @@ class Funciones():
 
     def grisarCuadro(self, cuadro):
         return cv2.cvtColor(cuadro, cv2.COLOR_BGR2GRAY)
+
+    def comicCuadro(self, cuadro):
+        print "A este cuadro hay que hacerlo comic"
+
+        sigma = 0.33
+
+
+        gray = cv2.cvtColor(cuadro, cv2.COLOR_BGRA2GRAY)
+        edges = cv2.blur(gray, (3, 3)) # this blur gets rid of some noise
+
+        v = np.median(edges)
+        lower = int(max(0, (1.0 - sigma) * v))
+        upper = int(min(255, (1.0 + sigma) * v))
+
+        edges = cv2.Canny(edges, lower, upper)
+        kernel = np.ones((3,3), dtype=np.float) / 12.0
+        edges = cv2.filter2D(edges, 0, kernel)
+        edges = cv2.threshold(edges, 50, 255, 0)[1]
+        edges = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
+        shifted = cv2.pyrMeanShiftFiltering(cuadro, 3, 20)
+
+        return cv2.subtract(shifted, edges)
         
 
 class Ventana(QWidget):
@@ -90,7 +114,7 @@ class Ventana(QWidget):
             self.resize(temp.width(), temp.height())
 
 
-            cv2.waitKey(10)
+            cv2.waitKey(100)
 
     def keyPressEvent(self, event):
         tecla = str(event.text())
@@ -128,6 +152,7 @@ class Ventana(QWidget):
 
         self.botonFiltrosGris.clicked.connect(lambda: self.activarFiltro('g'))
         self.botonFiltrosReset.clicked.connect(lambda: self.activarFiltro(None))
+        self.botonFiltrosComic.clicked.connect(lambda: self.activarFiltro('x'))
 
     def activarFiltro(self, filtro):
         self.filtroActivo = filtro
